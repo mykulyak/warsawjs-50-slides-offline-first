@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>Offline-first applications</title>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="x-ua-compatible" content="ie=edge" />
+  <meta name="viewport" content="width=device-width" />
+
+  <link href="https://fonts.googleapis.com/css?family=Fira+Sans:400,900&amp;subset=latin-ext" rel="stylesheet" />
+
+  <!-- Shower Theme -->
+  <link rel="stylesheet" href="vendors/shower-ribbon/styles/screen-16x9.css" />
+  <link rel="stylesheet" href="vendors/shower-warsawjs/styles/main.css" />
+
+  <!-- Prism.js -->
+  <link rel="stylesheet" href="vendors/prism/prism.css" />
+  <link rel="stylesheet" href="vendors/prism/custom-prism.css" />
+
+  <style>
+    .slide ul, .slide ol {
+      margin-left: 2em;
+    }
+
+    div.center {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 80%;
+    }
+
+    pre.language-javascript {
+      font-size: 24px;
+    }
+  </style>
+</head>
+
+<body class="shower list">
+  <header class="caption">
+    <h1>WarsawJS Meetup: Offline-first applications</h1>
+    <p>We talk about JavaScript. Each month in Warsaw, Poland.</p>
+  </header>
+
+  <section class="slide front-page">
+    <div class="logo">
+      <!-- Logo WarsawJS -->
+      <img src="vendors/shower-warsawjs/images/logo.svg" width="350">
+    </div>
+    <div class="details">
+      <!-- 1. Avatar -->
+      <img src="images/andriy_mykulyak.jpg" alt="Speaker" height="200" />
+
+      <!-- 2. Speaker -->
+      <h2>Andriy Mykulyak</h2>
+
+      <!-- 3. Presentation title -->
+      <h2><strong>"Offline-first applications"</strong></h2>
+
+      <!-- 4. Presentation date -->
+      <h2>2018-10-10</h2>
+
+      <!-- 5. Contact the speaker -->
+      <h2><a href="http://twitter.com/speaker">@amykulyak</a></h2>
+    </div>
+  </section>
+
+  <section class="slide compact">
+    <h2>Plan</h2>
+    <ol>
+      <li>What is offline-first application ?</li>
+      <li>Offline-first architecture</li>
+      <li>Static asset caching</li>
+      <li>What is with application data ?</li>
+      <li>Adapting UI to offline</li>
+      <li>Collaborative applications</li>
+      <li>Other stuff</li>
+    </ol>
+  </section>
+
+  <section class="slide compact">
+    <h2>What is offline-first application ?</h2>
+    <p><mark>An application that remains functional even without network connection.</mark></p>
+    <p/>
+    <p>Also usable in cases:</p>
+    <ul>
+      <li>very slow connections</li>
+      <li>server overloads</li>
+      <li>downtimes</li>
+    </ul>
+  </section>
+
+  <section class="slide compact">
+    <h2>Offline - dinosaurs</h2>
+    <div class="center">
+      <img src="images/dinosaur.png" width="70%" />
+    </div>
+  </section>
+
+  <section class="slide compact">
+    <h2>Offline - basic</h2>
+    <ul>
+      <li>loads even when offline</li>
+      <li>tracks/shows connection status</li>
+      <li>when offline, blocking screen is displayed</li>
+      <li>restores normal operation when online</li>
+    </ul>
+  </section>
+
+  <section class="slide compact">
+    <h2>Offline - readable</h2>
+    <ul>
+      <li>all from basic</li>
+      <li>when offline, interface is still browsable</li>
+      <li>when offline, data modifications are blocked</li>
+    </ul>
+  </section>
+
+  <section class="slide compact">
+    <h2>Offline - first</h2>
+    <ul>
+      <li>all from basic and readable</li>
+      <li>when offline, data modifications are allowed</li>
+      <li>when online, synchronizes in the background with the server</li>
+    </ul>
+  </section>
+
+  <section class="slide compact">
+    <h2>Offline - omg</h2>
+    <ul>
+      <li>allows collaborative work, even when offline</li>
+      <li>real-time</li>
+      <li>operates on large amounts of data (1 Gb or more)</li>
+    </ul>
+  </section>
+
+  <section class="slide compact">
+    <h2>Architecture - SPA</h2>
+    <div class="center">
+      <img src="images/spa-arch.svg" width="70%" />
+    </div>
+  </section>
+
+  <section class="slide compact">
+    <h2>Offline architecture</h2>
+    <p><mark>Write applications as if there were no network connection at all.</mark></p>
+    <p>Consider communication with server as a side effect.</p>
+  </section>
+
+  <section class="slide compact">
+    <h2>Why not native apps ?</h2>
+    <ul>
+      <li>single code base</li>
+      <li>faster deployment and upgrades</li>
+      <li>a way higher visibility to customers</li>
+    </ul>
+  </section>
+
+  <section class="slide compact">
+    <h2>Offline challenges</h2>
+    <ul>
+      <li>What serves our application ?</li>
+      <li>How to manage (store, version, upgrade) application assets ?</li>
+      <li>Where to store application data ?</li>
+      <li>How to reliably synchronize with the server ?</li>
+    </ul>
+  </section>
+
+  <section class="slide compact">
+    <h2>Service workers to the rescue !</h2>
+    <ul>
+      <li>It is a separate script that sits between Web page and network</li>
+      <li>It can intercept requests from page to servers</li>
+      <li>It can receive notifications from servers</li>
+      <li>It can communicate with Web pages via <code>postMessage()</code></li>
+      <li>It can access cached HTTP content for this page</li>
+    </ul>
+  </section>
+
+  <section class="slide compact">
+    <h2>Architecture - how SW works</h2>
+    <div class="center">
+      <img src="images/how-sw-works.svg" />
+    </div>
+  </section>
+
+  <section class="slide compact">
+    <h2>Architecture - service worker lifecycle</h2>
+    <div class="center">
+      <img src="images/sw-lifecycle.svg" />
+    </div>
+  </section>
+
+  <section class="slide compact">
+    <h2>Service worker registration<h2>
+    <pre class="language-javascript line-numbers">
+      <code>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    // service worker will control
+    // everything under /scope path
+    navigator.serviceWorker.register('/scope/sw.js');
+  });
+}
+      </code>
+    </pre>
+  </section>
+
+  <section class="slide compact">
+    <h2>Service worker lifecycle events<h2>
+    <pre class="language-javascript line-numbers">
+      <code>
+self.addEventListener('install', (event) => {
+  // we'll install soon
+});
+
+self.addEventListener('activate', (event) => {
+  // no other service workers are present
+  // we'll control our pages soon :)
+});
+      </code>
+    </pre>
+  </section>
+
+  <section class="slide compact">
+    <h2>Architecture - offline-first application</h2>
+    <div class="center">
+      <img src="images/offline-arch.svg" />
+    </div>
+  </section>  
+
+   <section class="slide compact">
+    <h2>Asset caching</h2>
+    <ul>
+      <li><a href="https://developer.mozilla.org/en-US/docs/Web/API/Cache" target="_blank">Cache API</a> is the foundation</li>
+      <li><mark>works offline</mark></li>
+      <li>can use HTTP Cache</li>
+      <li>very low-level (<code>add()</code>, <code>match()</code>, <code>put()</code>, <code>delete()</code></li>
+      <li>no versioning, expiration, etc.</li>
+      <li> is a nice wrapper</li>
+    </ul>
+  </section>
+
+  <section class="slide compact">
+    <h2><a href="https://developers.google.com/web/tools/workbox/" target="_blank">Workbox</a></h2>
+    <ul>
+      <li>high-level interface above Cache API</li>
+      <li>request routing and caching strategies</li>
+      <li>adds versioning and time-based expiration functionality</li>
+      <li>Webpack plugins for service worker generation</li>
+    </ul>
+  </section>
+
+  <section class="slide compact">
+    <h2>Workbox setup - easy way</h2>
+    <pre class="language-javascript line-numbers">
+      <code>
+import workboxPlugin from 'workbox-webpack-plugin';
+export default {
+  plugins: [
+    new workboxPlugin.GenerateSW(options),
+  ],
+};
+      </code>
+    </pre>
+  </section>
+
+  <section class="slide compact">
+    <h2>Workbox setup - customizable</h2>
+    <pre class="language-javascript line-numbers">
+      <code>
+import workbox from 'workbox-webpack-plugin';
+export default {
+  plugins: [
+    new workbox.InjectManifest({
+      swSrc: '/scope/service-worker.js'
+    })
+  ]
+}
+      </code>
+    </pre>
+  </section>
+
+  <section class="slide compact">
+    <h2>Caching strategies</h2>
+    <ul>
+      <li>precaching - download and cache an asset before service worker installs</li>
+      <li>cache, fallback to network - for rarely modified assets</li>
+      <li>stale-while-revalidate - use cache, fetch from network, update cache</li>
+    </ul>
+  </section>
+
+  <section class="slide compact">
+    <h2>Precaching - Cache API</h2>
+    <pre class="language-javascript line-numbers">
+      <code>
+self.addEventListener('install', event => {
+  event.waitUntil(
+    caches.open('cache-name').then(cache => {
+      cache.addAll([ ... ]); // non-required deps
+      return cache.addAll([ ... ]); // required deps
+    })
+  )
+});
+      </code>
+    </pre>
+  </section>
+
+  <section class="slide compact">
+    <h2>Precaching with Workbox</h2>
+    <pre class="language-javascript line-numbers">
+      <code>
+        importScripts('https://storage.googleapis.com/workbox-cdn/releases/3.6.2/workbox-sw.js');
+        importScripts('/scope/service-worker.js');
+
+        workbox.precaching.precacheAndRoute(
+          self.__precacheManifest || []
+        );
+      </code>
+    </pre>
+  </section>
+  
+  <section class="slide compact">
+    <h2>Cache, fallback to network - Cache API</h2>
+    <pre class="language-javascript line-numbers">
+      <code>
+self.addEventListener('fetch', (event) => {
+  event.respondWith(
+    caches.match(event.request).then((response) => {
+      return response || global.fetch(event.request);
+    })
+  );
+});
+      </code>
+    </pre>
+  </section>
+
+  <section class="slide compact">
+    <h2>Cache, fallback to network - Workbox</h2>
+    <pre class="language-javascript line-numbers">
+      <code>
+workbox.routing.registerRoute(
+  /\/avatars/.*\.(?:png|jpg|jpeg|svg|gif)/,
+  workbox.strategies.cacheFirst({
+    plugins: [
+      new workbox.expiration.Plugin({
+        maxEntries: 20,
+        maxAgeSeconds: 7 * 24 * 60 * 60,
+      })
+    ],
+  })
+);
+        </code>
+    </pre>
+  </section>
+
+  <section class="slide compact">
+    <h2>Where to store application data ?</h2>
+    <ul>
+      <li>localStorage</li>
+      <li>IndexedDB</li>
+      <li>PouchDB (with CouchDB)</li>
+      <li>Firebase</li>
+    </ul>
+  </section>
+
+  <section class="slide compact">
+    <h2>Using IndexedDB</h2>
+    <ul>
+      <li>object database</li>
+      <li>multiple stores, indexes</li>
+      <li>event-based</li>
+      <li>not the easiest interface</li>
+    </ul>
+  </section>
+
+  <section class="slide compact">
+    <h2>IndexedDB wrappers</h2>
+    <ul>
+      <li>Dexies.js</li>
+      <li>localForage</li>
+    </ul>
+  </section>
+
+  <section class="slide compact">
+    <h2>Application data - framework support</h2>
+    <ul>
+      <li>redux-offline</li>
+      <li>redux-persist</li>
+    </ul>
+  </section>
+
+  <section class="slide compact">
+    <h2>Application data - reading</h2>
+  </section>
+
+  <section class="slide compact">
+    <h2>Application data - writing</h2>
+    <ul>
+      <li>Background synchronization</li>
+    </ul>
+  </section>
+
+  <section class="slide compact">
+    <h2>Adapting UI to offline</h2>
+    <ul>
+      <li>Displaying connection status</li>
+      <li>Optimistic updates</li>
+      <li>Displaying update info for app objects</li>
+      <li>Resolving conflicts</li>
+    </ul>
+  </section>
+
+  <section class="slide compact">
+    <h2>Collaborative work</h2>
+    <ul>
+      <li>conflict resolution</li>
+      <li>MVCC</li>
+      <li>ETag</li>
+      <li>Operational Transform</li>
+    </ul>
+  </section>
+
+  <section class="slide compact">
+    <h2>Conflict resolution strategies</h2>
+    <ul>
+      <li>ShareDB</li>
+      <li>TurtleDB / TortoiseDB</li>
+    </ul>
+  </section>
+
+  <section class="slide compact">
+    <h2>Other (interesting) stuff</h2>
+    <ul>
+      <li>Security of offline applications</li>
+      <li>Authorization data</li>
+      <li>transactional applications</li>
+    </ul>
+  </section>
+
+  <section class="slide compact">
+    <h2>Links</h2>
+    <ul>
+      <li><a href="https://jakearchibald.com/2014/offline-cookbook/" target="_blank">Offline cookbook</a></li>
+      <li><a href="https://serviceworke.rs/" target="_blank">Service worker cookbook</a></li>
+      <li><a href="https://developers.google.com/web/tools/workbox/" target="_blank">Workbox</a></li>
+      <li><a href="http://dexie.org/" target="_blank">Dexie.js</a></li>
+      <li><a href="https://github.com/localForage/localForage" target="_blank">LocalForage</a></li>
+      <li><a href="https://pouchdb.com/" target="_blank">PouchDB</a></li>
+      <li><a href="https://firebase.google.com/" target="_blank">Firebase</a></li>
+    </ul>
+  </section>
+
+  <section class="slide">
+    <h3 class="shout">Time for questions</h3>
+  </section>
+  
+  <section class="slide">
+    <h3 class="shout">Thank you !</h3>
+  </section>
+  
+  <section class="slide">
+    <h3 class="shout">See you next month at WarsawJS</h3>
+  </section>
+
+  <div class="progress"></div>
+
+  <footer class="badge">
+    <a href="https://github.com/warsawjs/warsawjs-slides-template">Fork me on GitHub</a>
+  </footer>
+
+  <footer class="badge badge-top-left">
+    <a href="#" class="fullscreen">Fullscreen</a>
+  </footer>
+
+  <script src="vendors/gamepad/gamepad.js"></script>
+  <script src="vendors/shower/shower.min.js"></script>
+  <script src="vendors/shower-gamepad/shower.gamepad.js"></script>
+  <script src="vendors/shower-warsawjs/scripts/fullscreen.js"></script>
+
+  <!-- Prism.js -->
+  <script src="vendors/prism/prism.js"></script>
+  <script src="vendors/prism/custom-prism.js"></script>
+</body>
+
+</html>
